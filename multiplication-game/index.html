@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Multiplication Game</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+    /* Timer bar animation */
+    .timer-bar {
+      transition: width 0.1s linear;
+    }
+    /* Score popup animation */
+    .score-popup {
+      animation: popup 0.6s ease forwards;
+    }
+    @keyframes popup {
+      0% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
+
+  <!-- Welcome Screen -->
+  <section id="welcome-screen" class="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
+    <h1 class="text-3xl font-bold mb-4">Welcome to Multiplication Game</h1>
+    <label for="player-name" class="block mb-2 text-lg font-medium">Enter your name:</label>
+    <input
+      type="text"
+      id="player-name"
+      class="w-full p-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      placeholder="Your name"
+      autocomplete="off"
+    />
+    <button
+      id="start-game-btn"
+      class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+    >
+      Start Game
+    </button>
+  </section>
+
+  <!-- Game Screen -->
+  <section id="game-screen" class="hidden max-w-md w-full bg-white rounded-lg shadow-lg p-6 flex flex-col">
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-lg font-semibold">
+        Player: <span id="display-player-name"></span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-1">
+          <i class="fas fa-heart text-red-500"></i>
+          <span id="strikes" class="text-lg font-bold text-red-600">0</span>/5
+        </div>
+        <div class="flex items-center space-x-1">
+          <i class="fas fa-star text-yellow-400"></i>
+          <span id="score" class="text-lg font-bold text-yellow-600">0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <div id="timer-bar-container" class="w-full h-4 bg-gray-300 rounded overflow-hidden">
+        <div id="timer-bar" class="timer-bar h-4 bg-green-500 w-full"></div>
+      </div>
+    </div>
+
+    <div id="question-container" class="mb-6 text-center">
+      <h2 id="question" class="text-2xl font-bold mb-4">Question</h2>
+      <div id="answers" class="grid grid-cols-2 gap-4 max-w-sm mx-auto"></div>
+    </div>
+
+    <div id="score-popup" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-yellow-300 text-yellow-900 font-bold px-6 py-2 rounded shadow-lg opacity-0 pointer-events-none"></div>
+  </section>
+
+  <!-- Game Over Screen -->
+  <section id="game-over-screen" class="hidden max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
+    <h1 class="text-3xl font-bold mb-4 text-red-600">Game Over</h1>
+    <p class="mb-2 text-lg">Final Score: <span id="final-score"></span></p>
+    <p class="mb-2 text-lg">Total Time Survived: <span id="final-time"></span> seconds</p>
+    <p class="mb-4 text-lg">Correct Answers: <span id="final-correct"></span></p>
+    <button id="play-again-btn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition mb-4">
+      Play Again
+    </button>
+    <button id="change-name-btn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition mb-4">
+      Change Name
+    </button>
+    <button id="view-leaderboard-btn" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition">
+      View Leaderboard
+    </button>
+  </section>
+
+  <!-- Leaderboard Screen -->
+  <section id="leaderboard-screen" class="hidden max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
+    <h1 class="text-3xl font-bold mb-4">Leaderboard</h1>
+    <table class="w-full text-left border-collapse mb-4">
+      <thead>
+        <tr class="border-b border-gray-300">
+          <th class="py-2 px-4">Player</th>
+          <th class="py-2 px-4">Score</th>
+          <th class="py-2 px-4">Time Survived (s)</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboard-list"></tbody>
+    </table>
+    <button id="back-to-welcome-btn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+      Back to Welcome
+    </button>
+  </section>
+
+  <!-- Admin Panel Screen -->
+  <section id="admin-panel-screen" class="hidden max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
+    <h1 class="text-3xl font-bold mb-4 text-red-700">Admin Panel</h1>
+    <table class="w-full text-left border-collapse mb-4">
+      <thead>
+        <tr class="border-b border-gray-300">
+          <th class="py-2 px-4">Player</th>
+          <th class="py-2 px-4">Score</th>
+          <th class="py-2 px-4">Time Survived (s)</th>
+        </tr>
+      </thead>
+      <tbody id="admin-leaderboard-list"></tbody>
+    </table>
+    <div class="flex justify-center space-x-4 mb-4">
+      <button id="save-changes-btn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+        Save Changes
+      </button>
+    </div>
+    <div class="flex justify-center space-x-4">
+      <button id="clear-leaderboard-btn" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">
+        Clear Leaderboard
+      </button>
+      <button id="export-leaderboard-btn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+        Export as JSON
+      </button>
+      <button id="admin-back-btn" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition">
+        Back to Leaderboard
+      </button>
+    </div>
+  </section>
+
+  <script src="main.js"></script>
+</body>
+</html>
