@@ -1,2 +1,2 @@
-# blackboxai-1745052657286
+# Simple Project
 Built by https://www.blackbox.ai
